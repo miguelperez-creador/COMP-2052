@@ -13,34 +13,40 @@ def login():
     """
     form = LoginForm()
 
-    # Procesamiento del formulario si es enviado correctamente
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
 
-        # Verifica si el usuario existe y la contraseña es válida
         if user and user.check_password(form.password.data):
             login_user(user)
-            return redirect(url_for('main.dashboard'))
 
-        # Mensaje si las credenciales no son válidas
-        flash('Invalid credentials')  # 🔁 Traducido
+            # Redirige según el rol (opcional)
+            if user.role.name == "Admin":
+                return redirect(url_for('main.admin_dashboard'))
+            elif user.role.name == "Bibliotecario":
+                return redirect(url_for('main.librarian_dashboard'))
+            else:
+                return redirect(url_for('main.dashboard'))
 
-    # Renderiza el formulario de login
+        flash('Credenciales inválidas.')
+
     return render_template('login.html', form=form)
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     """
-    Registra un nuevo usuario y lo asocia por defecto al rol "Student".
+    Registra un nuevo usuario y lo asocia por defecto al rol seleccionado.
     """    
     form = RegisterForm()
     
-    # Procesa el formulario si fue enviado correctamente
     if form.validate_on_submit():
-        # Buscar el rol por nombre seleccionado
-        role = Role.query.filter_by(name=form.role.data).first() # Puedes renombrar esto a 'Student' si cambias toda la app a inglés
+        role = Role.query.filter_by(name=form.role.data).first()
 
-        # Crea el usuario con datos del formulario
+        # Si el rol no existe, puedes crearlo automáticamente (opcional)
+        if not role:
+            role = Role(name=form.role.data)
+            db.session.add(role)
+            db.session.commit()
+
         user = User(
             username=form.username.data,
             email=form.email.data,
@@ -48,15 +54,12 @@ def register():
         )
         user.set_password(form.password.data)
 
-        # Guarda en la base de datos
         db.session.add(user)
         db.session.commit()
 
-        # Muestra mensaje de éxito
-        flash('User registered successfully.')
+        flash('Usuario registrado con éxito.')
         return redirect(url_for('auth.login'))
-    
-    # Renderiza el formulario de registro
+
     return render_template('register.html', form=form)
 
 @auth.route('/logout')

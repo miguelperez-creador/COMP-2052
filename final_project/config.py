@@ -15,8 +15,20 @@ class Config:
     # Ejemplo para MySQL usando PyMySQL (puede adaptarse a PostgreSQL o SQLite)
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL',
-        'mysql+pymysql://root:root@localhost/gestion_cursos'  # Valor por defecto para entorno local (MAMP/XAMPP)
+        'mysql+pymysql://root:root@localhost/gestion_biblioteca'  # Modificado para biblioteca
     )
 
     # Desactiva el sistema de seguimiento de modificaciones de SQLAlchemy (mejora el rendimiento)
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Configuración para roles en el sistema
+    # Esta es solo una sugerencia, puedes adaptarlo según lo que necesites
+    ROLES = {
+        'lector': 'Lector',
+        'bibliotecario': 'Bibliotecario',
+        'admin': 'Admin'
+    }
+
+    # Configuración adicional para validaciones de seguridad
+    # Puedes agregar más reglas aquí si es necesario, como CSRF, etc.
+    CSRF_ENABLED = True  # Habilitar protección CSRF
