@@ -14,12 +14,12 @@ def create_app():
     db.init_app(app)
     login_manager.init_app(app)
 
-    from app.routes import main 
-    # from app.test_routes import main
-    
+    # Registra primero autenticación para proteger rutas desde el inicio
     from app.auth_routes import auth
-
-    app.register_blueprint(main)
     app.register_blueprint(auth)
+
+    # Registra las rutas principales (por ejemplo, gestión de libros)
+    from app.routes import main  # Considera renombrarlo a books si es solo para libros
+    app.register_blueprint(main)
 
     return app

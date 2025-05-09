@@ -1,93 +1,108 @@
 from flask import Blueprint, request, jsonify
-from app.models import db, Curso
+from app.models import db, Libro, Role
+from flask_login import current_user, login_required
 
-# Blueprint solo con endpoints de prueba para cursos
+# Blueprint para libros
 main = Blueprint('main', __name__)
 
-@main.route('/') # Ambas rutas llevan al mismo lugar
+@main.route('/')
 @main.route('/dashboard')
 def index():
     """
     Página de inicio pública (home).
     """
-    return '<h1>Corriendo en Modo de Prueba.</h1>'
+    return '<h1>Corriendo el Gestor de Biblioteca.</h1>'
 
-@main.route('/cursos', methods=['GET'])
-def listar_cursos():
+# Lista todos los libros
+@main.route('/libros', methods=['GET'])
+def listar_libros():
     """
-    Retorna una lista de cursos (JSON).
+    Retorna una lista de libros (JSON).
     """
-    cursos = Curso.query.all()
+    libros = Libro.query.all()
 
     data = [
-        {'id': curso.id, 'titulo': curso.titulo, 'descripcion': curso.descripcion, 'profesor_id': curso.profesor_id}
-        for curso in cursos
+        {'id': libro.id, 'titulo': libro.titulo, 'autor': libro.autor, 'descripcion': libro.descripcion}
+        for libro in libros
     ]
     return jsonify(data), 200
 
-
-@main.route('/cursos/<int:id>', methods=['GET'])
-def listar_un_curso(id):
+# Lista un solo libro por su ID
+@main.route('/libros/<int:id>', methods=['GET'])
+def listar_un_libro(id):
     """
-    Retorna un solo curso por su ID (JSON).
+    Retorna un solo libro por su ID (JSON).
     """
-    curso = Curso.query.get_or_404(id)
+    libro = Libro.query.get_or_404(id)
 
     data = {
-        'id': curso.id,
-        'titulo': curso.titulo,
-        'descripcion': curso.descripcion,
-        'profesor_id': curso.profesor_id
+        'id': libro.id,
+        'titulo': libro.titulo,
+        'autor': libro.autor,
+        'descripcion': libro.descripcion
     }
 
     return jsonify(data), 200
 
+# Solo Bibliotecarios o Admin pueden crear un libro
+@main.route('/libros', methods=['POST'])
+@login_required
+def crear_libro():
+    """
+    Crea un libro solo si el usuario tiene el rol adecuado (Bibliotecario o Admin).
+    """
+    if current_user.role.name not in ['Bibliotecario', 'Admin']:
+        return jsonify({'error': 'No tienes permisos para agregar libros'}), 403
 
-@main.route('/cursos', methods=['POST'])
-def crear_curso():
-    """
-    Crea un curso sin validación.
-    Espera JSON con 'titulo', 'descripcion' y 'profesor_id'.
-    """
     data = request.get_json()
 
     if not data:
         return jsonify({'error': 'No input data provided'}), 400
 
-    curso = Curso(
+    libro = Libro(
         titulo=data.get('titulo'),
-        descripcion=data.get('descripcion'),
-        profesor_id=data.get('profesor_id')  # sin validación de usuario
+        autor=data.get('autor'),
+        descripcion=data.get('descripcion')
     )
 
-    db.session.add(curso)
+    db.session.add(libro)
     db.session.commit()
 
-    return jsonify({'message': 'Curso creado', 'id': curso.id, 'profesor_id': curso.profesor_id}), 201
+    return jsonify({'message': 'Libro creado', 'id': libro.id}), 201
 
-@main.route('/cursos/<int:id>', methods=['PUT'])
-def actualizar_curso(id):
+# Solo Bibliotecarios o Admin pueden actualizar un libro
+@main.route('/libros/<int:id>', methods=['PUT'])
+@login_required
+def actualizar_libro(id):
     """
-    Actualiza un curso sin validación de usuario o permisos.
+    Actualiza un libro solo si el usuario tiene el rol adecuado (Bibliotecario o Admin).
     """
-    curso = Curso.query.get_or_404(id)
+    if current_user.role.name not in ['Bibliotecario', 'Admin']:
+        return jsonify({'error': 'No tienes permisos para actualizar libros'}), 403
+
+    libro = Libro.query.get_or_404(id)
     data = request.get_json()
 
-    curso.titulo = data.get('titulo', curso.titulo)
-    curso.descripcion = data.get('descripcion', curso.descripcion)
-    curso.profesor_id = data.get('profesor_id', curso.profesor_id)
+    libro.titulo = data.get('titulo', libro.titulo)
+    libro.autor = data.get('autor', libro.autor)
+    libro.descripcion = data.get('descripcion', libro.descripcion)
 
     db.session.commit()
 
-    return jsonify({'message': 'Curso actualizado', 'id': curso.id}), 200
+    return jsonify({'message': 'Libro actualizado', 'id': libro.id}), 200
 
-@main.route('/cursos/<int:id>', methods=['DELETE'])
-def eliminar_curso(id):
+# Solo Bibliotecarios o Admin pueden eliminar un libro
+@main.route('/libros/<int:id>', methods=['DELETE'])
+@login_required
+def eliminar_libro(id):
     """
-    Elimina un curso sin validación de permisos.
+    Elimina un libro solo si el usuario tiene el rol adecuado (Bibliotecario o Admin).
     """
-    curso = Curso.query.get_or_404(id)
-    db.session.delete(curso)
+    if current_user.role.name not in ['Bibliotecario', 'Admin']:
+        return jsonify({'error': 'No tienes permisos para eliminar libros'}), 403
+
+    libro = Libro.query.get_or_404(id)
+    db.session.delete(libro)
     db.session.commit()
 
-    return jsonify({'message': 'Curso eliminado', 'id': curso.id}), 200
+    return jsonify({'message': 'Libro eliminado', 'id': libro.id}), 200

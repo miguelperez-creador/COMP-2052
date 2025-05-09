@@ -6,8 +6,12 @@ app = create_app()
 
 with app.app_context():
     # Asegurarse de que los roles existen
+<<<<<<< HEAD
     # Roles según el proyecto Gestor de Biblioteca
     roles = ['Admin', 'Bibliotecario', 'Lector']
+=======
+    roles = ['Admin', 'Bibliotecario', 'Lector']  # Roles ajustados según el proyecto
+>>>>>>> 1703a668491d341c2c7aab5aa1cd229b83895dbb
     for role_name in roles:
         existing_role = Role.query.filter_by(name=role_name).first()
         if not existing_role:

@@ -1,14 +1,14 @@
-{% extends "layout.html" %} {% block title %}Dashboard{% endblock %} {% block
-content %}
+{% extends "layout.html" %}
+{% block title %}Panel de Control de la Biblioteca{% endblock %}
+{% block content %}
 <div class="row">
   <div class="col">
-    <h3>Course Management</h3>
+    <h3>Gestión de la Biblioteca</h3>
   </div>
   <div class="col text-end">
-    <!-- Change the next line for your project -->
     {% if current_user.role.name != 'Student' %}
-    <a class="btn btn-primary mb-3 me-2" href="{{ url_for('main.cursos') }}">
-      <i class="bi bi-plus"></i> New
+    <a class="btn btn-primary mb-3 me-2" href="{{ url_for('main.nuevo_libro') }}">
+      <i class="bi bi-plus"></i> Añadir Libro
     </a>
     {% endif %}
   </div>
@@ -17,40 +17,25 @@ content %}
 <table class="table table-bordered table-hover">
   <thead class="table-light">
     <tr>
-      <th>Title</th>
-      <th>Description</th>
-      <th>Instructor</th>
-      <th class="text-center">Actions</th>
+      <th>Título</th>
+      <th>Autor</th>
+      <th>Género</th>
+      <th class="text-center">Acciones</th>
     </tr>
   </thead>
   <tbody>
-    {% for curso in cursos %}
+    {% for libro in libros %}
     <tr>
-      <td>{{ curso.titulo }}</td>
-      <td>{{ curso.descripcion }}</td>
-      <td>{{ curso.profesor.username }}</td>
+      <td>{{ libro.titulo }}</td>
+      <td>{{ libro.autor }}</td>
+      <td>{{ libro.genero }}</td>
       <td class="text-center ps-0 pe-0">
-        {% if current_user.role.name == 'Admin' or curso.profesor_id ==
-        current_user.id %}
-
-        <a
-          class="btn btn-sm btn-warning"
-          href="{{ url_for('main.editar_curso', id=curso.id) }}"
-          title="Edit course"
-        >
+        {% if current_user.role.name == 'Admin' or libro.usuario_id == current_user.id %}
+        <a class="btn btn-sm btn-warning" href="{{ url_for('main.editar_libro', id=libro.id) }}" title="Editar libro">
           <i class="bi bi-pencil"></i>
         </a>
-        <form
-          method="POST"
-          action="{{ url_for('main.eliminar_curso', id=curso.id) }}"
-          style="display: inline"
-          onsubmit="return confirm('Are you sure you want to delete this course?');"
-        >
-          <button
-            type="submit"
-            class="btn btn-sm btn-danger"
-            title="Delete course"
-          >
+        <form method="POST" action="{{ url_for('main.eliminar_libro', id=libro.id) }}" style="display: inline" onsubmit="return confirm('¿Estás seguro de eliminar este libro?');">
+          <button type="submit" class="btn btn-sm btn-danger" title="Eliminar libro">
             <i class="bi bi-trash"></i>
           </button>
         </form>
@@ -63,9 +48,9 @@ content %}
   </tbody>
 </table>
 
-<!-- Change the next line for your project -->
 {% if current_user.role.name == 'Student' %}
 <p class="text-center pe-3 mt-0 text-body-tertiary fw-lighter fst-italic">
-  You do not have permission to create, update or delete courses.
+  No tienes permisos para añadir, editar o eliminar libros.
 </p>
-{% endif %} {% endblock %}
+{% endif %}
+{% endblock %}

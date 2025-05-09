@@ -6,32 +6,37 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Login')
+    submit = SubmitField('Iniciar sesión')
 
 # Formulario para registrar un nuevo usuario
 class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
+    username = StringField('Nombre de usuario', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm password', validators=[DataRequired(), EqualTo('password')])
+    password = PasswordField('Contraseña', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirmar contraseña', validators=[DataRequired(), EqualTo('password')])
     
     role = SelectField(
-        'Role',
-        choices=[('Student', 'Student'), ('Professor', 'Professor')],
+        'Rol',
+        choices=[
+            ('Lector', 'Lector'),
+            ('Bibliotecario', 'Bibliotecario'),
+            ('Admin', 'Admin')
+        ],
         validators=[DataRequired()]
     )
 
-    submit = SubmitField('Register')
+    submit = SubmitField('Registrar')
 
 # Formulario para cambiar la contraseña del usuario
 class ChangePasswordForm(FlaskForm):
-    old_password = PasswordField('Current password', validators=[DataRequired()])
-    new_password = PasswordField('New password', validators=[DataRequired(), Length(min=6)])
-    confirm_password = PasswordField('Confirm new password', validators=[DataRequired(), EqualTo('new_password')])
-    submit = SubmitField('Update Password')
+    old_password = PasswordField('Contraseña actual', validators=[DataRequired()])
+    new_password = PasswordField('Nueva contraseña', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirmar nueva contraseña', validators=[DataRequired(), EqualTo('new_password')])
+    submit = SubmitField('Actualizar contraseña')
 
-# Formulario para crear o editar un curso
-class CursoForm(FlaskForm):
-    titulo = StringField('Course title', validators=[DataRequired()])
-    descripcion = TextAreaField('Description', validators=[DataRequired()])
-    submit = SubmitField('Save')
+# Formulario para crear o editar un libro
+class BookForm(FlaskForm):
+    titulo = StringField('Título del libro', validators=[DataRequired()])
+    descripcion = TextAreaField('Descripción', validators=[DataRequired()])
+    autor = StringField('Autor', validators=[DataRequired()])
+    submit = SubmitField('Guardar')
