@@ -1,9 +1,10 @@
-### Crear un nuevo curso (POST)
-POST http://localhost:5000/cursos
+### Crear un nuevo libro (POST)
+POST http://localhost:5000/libros
 Content-Type: application/json
 
 {
-  "titulo": "Flask Avanzado",
-  "descripcion": "Curso intensivo de desarrollo con Flask",
-  "profesor_id": 1
+  "titulo": "Cien Años de Soledad",
+  "autor": "Gabriel García Márquez",
+  "anio_publicacion": 1967,
+  "bibliotecario_id": 1
 }

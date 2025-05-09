@@ -1,22 +1,34 @@
 import os
 
+
 class Config:
     """
-    Configuración general de la aplicación Flask.
-    Puede extenderse a diferentes entornos (Desarrollo, Producción, etc.).
+    Configuración general para la aplicación Gestor de Biblioteca.
+    Esta clase puede extenderse para diferentes entornos (desarrollo, producción, pruebas, etc.).
     """
 
-    # Clave secreta para proteger sesiones y formularios (CSRF)
+    # Clave secreta para sesiones y protección CSRF
     # ⚠️ En producción, se recomienda definir esta variable en el entorno
     SECRET_KEY = os.environ.get('SECRET_KEY', 'clave-secreta-flask')
 
     # URI de conexión a la base de datos
-    # Formato: dialecto+driver://usuario:contraseña@host/basededatos
-    # Ejemplo para MySQL usando PyMySQL (puede adaptarse a PostgreSQL o SQLite)
+    # Puedes usar otra según tu gestor (PostgreSQL, SQLite, etc.)
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL',
-        'mysql+pymysql://root:root@localhost/gestion_cursos'  # Valor por defecto para entorno local (MAMP/XAMPP)
+        'mysql+pymysql://root:root@localhost/gestion_biblioteca'
     )
 
-    # Desactiva el sistema de seguimiento de modificaciones de SQLAlchemy (mejora el rendimiento)
+    # Desactiva el seguimiento de modificaciones para mejorar el rendimiento
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Protección CSRF habilitada
+    CSRF_ENABLED = True
+
+    # Definición de roles disponibles en el sistema
+    ROLES = {
+        'lector': 'Lector',
+        'bibliotecario': 'Bibliotecario',
+        'admin': 'Admin'
+    }
+
+    # Puedes añadir aquí otras configuraciones necesarias, como paginación, logs, etc.

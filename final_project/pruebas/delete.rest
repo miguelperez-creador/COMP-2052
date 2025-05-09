@@ -1,2 +1,3 @@
-### Eliminar curso (POST)
-DELETE http://localhost:5000/cursos/4
+### Eliminar libro (DELETE)
+DELETE http://localhost:5000/libros/4
+Content-Type: application/json

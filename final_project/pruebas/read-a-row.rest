@@ -1,3 +1,3 @@
-### Obtener curso por ID (GET)
-GET http://localhost:5000/cursos/1
+### Obtener libro por ID (GET)
+GET http://localhost:5000/libros/1
 Content-Type: application/json

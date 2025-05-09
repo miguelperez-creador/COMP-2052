@@ -1,10 +1,10 @@
-### Editar un curso (POST)
-
-# Simular POST con nuevos datos del curso
-PUT http://localhost:5000/cursos/4
+### Editar libro (PUT)
+PUT http://localhost:5000/libros/4
 Content-Type: application/json
 
 {
-  "titulo": "Curso actualizado",
-  "descripcion": "Nueva descripción actualizada"
+  "titulo": "Libro actualizado",
+  "descripcion": "Nueva descripción actualizada",
+  "autor": "Jane Doe",
+  "anio_publicacion": 2025
 }
