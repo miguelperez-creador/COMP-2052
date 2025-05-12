@@ -1,27 +1,23 @@
 from app import create_app, db
 from app.models import Role, User
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash  # Por si necesitas usarlo directamente
 
+# Crear la aplicación Flask
 app = create_app()
 
+# Contexto de aplicación necesario para operaciones con la base de datos
 with app.app_context():
-    # Asegurarse de que los roles existen
-<<<<<<< HEAD
-    # Roles según el proyecto Gestor de Biblioteca
+    # Crear roles si no existen
     roles = ['Admin', 'Bibliotecario', 'Lector']
-=======
-    roles = ['Admin', 'Bibliotecario', 'Lector']  # Roles ajustados según el proyecto
->>>>>>> 1703a668491d341c2c7aab5aa1cd229b83895dbb
     for role_name in roles:
-        existing_role = Role.query.filter_by(name=role_name).first()
-        if not existing_role:
+        if not Role.query.filter_by(name=role_name).first():
             new_role = Role(name=role_name)
             db.session.add(new_role)
             print(f'Rol "{role_name}" creado.')
 
-    db.session.commit()  # Confirmar creación de roles
+    db.session.commit()
 
-    # Diccionario con usuarios a insertar
+    # Datos de usuarios iniciales
     users_data = [
         {
             "username": "Administrator",
@@ -45,20 +41,21 @@ with app.app_context():
 
     # Crear usuarios si no existen
     for user_info in users_data:
-        existing_user = User.query.filter_by(email=user_info['email']).first()
-        if not existing_user:
+        if not User.query.filter_by(email=user_info['email']).first():
             role = Role.query.filter_by(name=user_info['role_name']).first()
-            user = User(
-                username=user_info['username'],
-                email=user_info['email'],
-                role=role
-            )
-            # Genera hash seguro para contraseñas
-            user.set_password(user_info['password'])
-            db.session.add(user)
-            print(f'Usuario "{user.username}" creado con rol "{role.name}".')
+            if role:
+                user = User(
+                    username=user_info['username'],
+                    email=user_info['email'],
+                    role=role
+                )
+                user.set_password(user_info['password'])  # Método seguro para hashear contraseña
+                db.session.add(user)
+                print(f'Usuario "{user.username}" creado con rol "{role.name}".')
+            else:
+                print(f'Rol "{user_info["role_name"]}" no encontrado. No se creó el usuario.')
         else:
-            print(f'El usuario con email {user_info["email"]} ya existe.')
+            print(f'El usuario con email "{user_info["email"]}" ya existe.')
 
     db.session.commit()
     print("Todos los usuarios fueron procesados correctamente.")

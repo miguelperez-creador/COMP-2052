@@ -1,105 +1,149 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
-from app.forms import BookForm
-from app.models import db, User, Role, Book
+from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
+from app.forms import LibroForm, ChangePasswordForm, PrestamoForm
+from app.models import db, Libro, User, Prestamo
 
-# Blueprint principal para la gestión de libros
+# Blueprint principal que maneja el dashboard, gestión de libros y cambio de contraseña
 main = Blueprint('main', __name__)
+
+@main.route('/')
+def index():
+    """
+    Página de inicio pública (home).
+    """
+    return render_template('index.html')
+
+@main.route('/cambiar-password', methods=['GET', 'POST'])
+@login_required
+def cambiar_password():
+    """
+    Permite al usuario autenticado cambiar su contraseña.
+    """
+    form = ChangePasswordForm()
+
+    if form.validate_on_submit():
+        # Verifica que la contraseña actual sea correcta
+        if not current_user.check_password(form.old_password.data):
+            flash('La contraseña actual es incorrecta.')
+            return render_template('cambiar_password.html', form=form)
+
+        # Actualiza la contraseña y guarda
+        current_user.set_password(form.new_password.data)
+        db.session.commit()
+        flash('Contraseña actualizada correctamente.')
+        return redirect(url_for('main.dashboard'))
+
+    return render_template('cambiar_password.html', form=form)
 
 @main.route('/dashboard')
 @login_required
 def dashboard():
     """
-    Página principal para el Lector: solo lectura de libros.
+    Panel principal del usuario. Muestra los libros si no es lector.
     """
-    books = Book.query.all()  # Trae todos los libros
-    return render_template('dashboard.html', books=books)
+    if current_user.role.name == 'Lector':  # Solo los lectores ven los libros disponibles
+        libros = Libro.query.filter_by(disponible=True).all()
+    else:
+        libros = Libro.query.all()  # Admin y bibliotecarios pueden ver todos los libros
 
-@main.route('/admin_dashboard')
-@login_required
-def admin_dashboard():
-    """
-    Página para el Admin: vista de administración general.
-    Solo puede ser accesible por usuarios con rol "Admin".
-    """
-    if current_user.role.name != 'Admin':
-        return redirect(url_for('main.dashboard'))
-    
-    # Lógica adicional si el usuario es Admin
-    return render_template('admin_dashboard.html')
+    return render_template('dashboard.html', libros=libros)
 
-@main.route('/librarian_dashboard')
+@main.route('/libros', methods=['GET', 'POST'])
 @login_required
-def librarian_dashboard():
+def libros():
     """
-    Página para el Bibliotecario: gestión de libros.
-    Solo puede ser accesible por "Bibliotecario" o "Admin".
+    Permite crear un nuevo libro. Solo disponible para bibliotecarios o admins.
     """
-    if current_user.role.name not in ['Bibliotecario', 'Admin']:
-        return redirect(url_for('main.dashboard'))
-    
-    books = Book.query.all()
-    return render_template('librarian_dashboard.html', books=books)
-
-@main.route('/add_book', methods=['GET', 'POST'])
-@login_required
-def add_book():
-    """
-    Permite a Bibliotecarios y Admin agregar nuevos libros.
-    """
-    if current_user.role.name not in ['Bibliotecario', 'Admin']:
-        flash('No tienes permisos para agregar libros.')
-        return redirect(url_for('main.dashboard'))
-    
-    form = BookForm()
+    form = LibroForm()
     if form.validate_on_submit():
-        book = Book(
+        libro = Libro(
             titulo=form.titulo.data,
             descripcion=form.descripcion.data,
-            autor=form.autor.data
+            autor=form.autor.data,
+            disponible=True  # Por defecto, los libros recién creados están disponibles
         )
-        db.session.add(book)
+        db.session.add(libro)
         db.session.commit()
-        flash('Libro agregado exitosamente.')
-        return redirect(url_for('main.librarian_dashboard'))
-
-    return render_template('add_book.html', form=form)
-
-@main.route('/edit_book/<int:id>', methods=['GET', 'POST'])
-@login_required
-def edit_book(id):
-    """
-    Permite a Bibliotecarios y Admin editar detalles de un libro.
-    """
-    if current_user.role.name not in ['Bibliotecario', 'Admin']:
-        flash('No tienes permisos para editar libros.')
+        flash("Libro creado exitosamente.")
         return redirect(url_for('main.dashboard'))
-    
-    book = Book.query.get_or_404(id)
-    form = BookForm(obj=book)
-    
+
+    return render_template('libro_form.html', form=form)
+
+@main.route('/libros/<int:id>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_libro(id):
+    """
+    Permite editar un libro existente. Solo si es admin o bibliotecario.
+    """
+    libro = Libro.query.get_or_404(id)
+
+    # Validación de permisos
+    if current_user.role.name not in ['Admin', 'Bibliotecario']:
+        flash('No tienes permiso para editar este libro.')
+        return redirect(url_for('main.dashboard'))
+
+    form = LibroForm(obj=libro)
+
     if form.validate_on_submit():
-        book.titulo = form.titulo.data
-        book.descripcion = form.descripcion.data
-        book.autor = form.autor.data
+        libro.titulo = form.titulo.data
+        libro.descripcion = form.descripcion.data
+        libro.autor = form.autor.data
         db.session.commit()
-        flash('Libro editado exitosamente.')
-        return redirect(url_for('main.librarian_dashboard'))
-    
-    return render_template('edit_book.html', form=form, book=book)
-
-@main.route('/delete_book/<int:id>', methods=['POST'])
-@login_required
-def delete_book(id):
-    """
-    Permite a Bibliotecarios y Admin eliminar un libro.
-    """
-    if current_user.role.name not in ['Bibliotecario', 'Admin']:
-        flash('No tienes permisos para eliminar libros.')
+        flash("Libro actualizado exitosamente.")
         return redirect(url_for('main.dashboard'))
 
-    book = Book.query.get_or_404(id)
-    db.session.delete(book)
+    return render_template('libro_form.html', form=form, editar=True)
+
+@main.route('/libros/<int:id>/eliminar', methods=['POST'])
+@login_required
+def eliminar_libro(id):
+    """
+    Elimina un libro si el usuario es admin o bibliotecario.
+    """
+    libro = Libro.query.get_or_404(id)
+
+    if current_user.role.name not in ['Admin', 'Bibliotecario']:
+        flash('No tienes permiso para eliminar este libro.')
+        return redirect(url_for('main.dashboard'))
+
+    db.session.delete(libro)
     db.session.commit()
-    flash('Libro eliminado exitosamente.')
-    return redirect(url_for('main.librarian_dashboard'))
+    flash("Libro eliminado exitosamente.")
+    return redirect(url_for('main.dashboard'))
+
+@main.route('/prestamos', methods=['GET', 'POST'])
+@login_required
+def prestamos():
+    """
+    Permite registrar un préstamo de libro. Solo disponible para lectores.
+    """
+    form = PrestamoForm()
+    form.libro_id.choices = [(libro.id, libro.titulo) for libro in Libro.query.filter_by(disponible=True).all()]
+
+    if form.validate_on_submit():
+        prestamo = Prestamo(
+            usuario_id=current_user.id,
+            libro_id=form.libro_id.data,
+            fecha_prestamo=form.fecha_prestamo.data,
+            fecha_devolucion=form.fecha_devolucion.data
+        )
+        libro = Libro.query.get(form.libro_id.data)
+        libro.disponible = False  # Marca el libro como no disponible
+        db.session.add(prestamo)
+        db.session.commit()
+        flash("Préstamo registrado exitosamente.")
+        return redirect(url_for('main.dashboard'))
+
+    return render_template('prestamo_form.html', form=form)
+
+@main.route('/usuarios')
+@login_required
+def listar_usuarios():
+    if current_user.role.name != 'Admin':
+        flash("No tienes permiso para ver esta página.")
+        return redirect(url_for('main.dashboard'))
+
+    # Obtener instancias completas de usuarios con sus roles (no usar .add_columns)
+    usuarios = User.query.join(User.role).all()
+
+    return render_template('usuarios.html', usuarios=usuarios)
