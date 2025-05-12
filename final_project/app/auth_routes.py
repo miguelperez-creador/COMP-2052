@@ -41,7 +41,7 @@ def register():
     if form.validate_on_submit():
         role = Role.query.filter_by(name=form.role.data).first()
 
-        # Si el rol no existe, puedes crearlo automáticamente (opcional)
+        
         if not role:
             role = Role(name=form.role.data)
             db.session.add(role)
