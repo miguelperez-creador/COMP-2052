@@ -1,59 +1,40 @@
 {% extends "layout.html" %}
-{% block title %}Gestión de Libros{% endblock %}
+
+{% block title %}Libros{% endblock %}
 
 {% block content %}
-<div class="row">
-  <div class="col">
-    <h3>Gestión de Libros</h3>
-  </div>
-  <div class="col text-end">
-    {% if current_user.role.name != 'Estudiante' %}
-    <a class="btn btn-primary mb-3 me-2" href="{{ url_for('main.nuevo_libro') }}">
-      <i class="bi bi-plus"></i> Nuevo Libro
-    </a>
-    {% endif %}
-  </div>
-</div>
+  <h2 class="mb-4">Lista de Libros</h2>
 
-<table class="table table-bordered table-hover">
-  <thead class="table-light">
-    <tr>
-      <th>Título</th>
-      <th>Autor</th>
-      <th>Género</th>
-      <th>Descripción</th>
-      <th class="text-center">Acciones</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for libro in libros %}
-    <tr>
-      <td>{{ libro.titulo }}</td>
-      <td>{{ libro.autor }}</td>
-      <td>{{ libro.genero }}</td>
-      <td>{{ libro.descripcion }}</td>
-      <td class="text-center">
-        {% if current_user.role.name == 'Admin' or libro.usuario_id == current_user.id %}
-        <a class="btn btn-sm btn-warning" href="{{ url_for('main.editar_libro', id=libro.id) }}" title="Editar libro">
-          <i class="bi bi-pencil"></i>
-        </a>
-        <form method="POST" action="{{ url_for('main.eliminar_libro', id=libro.id) }}" style="display: inline" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este libro?');">
-          <button type="submit" class="btn btn-sm btn-danger" title="Eliminar libro">
-            <i class="bi bi-trash"></i>
-          </button>
-        </form>
-        {% else %}
-        <span class="text-muted"><i class="bi bi-lock"></i></span>
-        {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-{% if current_user.role.name == 'Estudiante' %}
-<p class="text-center pe-3 mt-0 text-body-tertiary fw-lighter fst-italic">
-  No tienes permiso para crear, editar o eliminar libros.
-</p>
-{% endif %}
+  <!-- Tabla de Libros -->
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Título</th>
+        <th scope="col">Descripción</th>
+        <th scope="col">Autor</th>
+        <th scope="col">Disponibilidad</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for libro in libros %}
+        <tr>
+          <td>{{ libro.id }}</td>
+          <td>{{ libro.titulo }}</td>
+          <td>{{ libro.descripcion }}</td>
+          <td>{{ libro.autor }}</td>
+          <td>{{ libro.disponible | yesno:"Disponible,No disponible" }}</td>
+          <td>
+            <a href="{{ url_for('main.editar_libro', id=libro.id) }}" class="btn btn-warning">Editar</a>
+            <form action="{{ url_for('main.eliminar_libro', id=libro.id) }}" method="POST" style="display:inline;">
+              <button type="submit" class="btn btn-danger">Eliminar</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <a href="{{ url_for('main.crear_libro') }}" class="btn btn-primary">Nuevo Libro</a>
 {% endblock %}
