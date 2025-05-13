@@ -15,7 +15,7 @@ class Config:
     # URI de conexión a la base de datos
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         'DATABASE_URL',
-        'mysql+pymysql://root:root@localhost/gestion_biblioteca'
+        'mysql+pymysql://root:root@localhost/gestor_biblioteca'
     )
 
     # Desactiva el seguimiento de modificaciones de objetos (mejora el rendimiento)
@@ -31,4 +31,4 @@ class Config:
         'admin': 'Admin'
     }
 
-    
+    # Puedes añadir aquí otras configuraciones necesarias, como paginación, logs, etc.
