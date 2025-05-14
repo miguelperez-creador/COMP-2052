@@ -1,51 +1,34 @@
 {% extends "layout.html" %}
 
-{% block title %}Libros{% endblock %}
+{% block title %}Crear Libro{% endblock %}
 
 {% block content %}
-  <h2 class="mb-4">Lista de Libros</h2>
-
-  <!-- Tabla de Libros -->
-  <table class="table">
-    <thead>
-      <tr>
-        <th scope="col">ID</th>
-        <th scope="col">Título</th>
-        <th scope="col">Descripción</th>
-        <th scope="col">Autor</th>
-        <th scope="col">Disponibilidad</th>
-        <th scope="col">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% if libros|length == 0 %}
-        <tr>
-          <td colspan="6" class="text-center">No hay libros disponibles.</td>
-        </tr>
-      {% else %}
-        {% for libro in libros %}
-          <tr>
-            <td>{{ libro.id }}</td>
-            <td>{{ libro.titulo }}</td>
-            <td>{{ libro.descripcion }}</td>
-            <td>{{ libro.autor }}</td>
-            <td>{{ 'Disponible' if libro.disponible else 'No disponible' }}</td>
-            <td>
-              <!-- Botón Editar -->
-              <a href="{{ url_for('main.editar_libro', id=libro.id) }}" class="btn btn-warning">Editar</a>
-
-              <!-- Formulario para eliminar libro -->
-              <form action="{{ url_for('main.eliminar_libro', id=libro.id) }}" method="POST" style="display:inline;">
-                {{ csrf_token() }}
-                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este libro?')">Eliminar</button>
-              </form>
-            </td>
-          </tr>
-        {% endfor %}
-      {% endif %}
-    </tbody>
-  </table>
-
-  <!-- Botón para crear nuevo libro -->
-  <a href="{{ url_for('main.crear_libro') }}" class="btn btn-primary">Nuevo Libro</a>
+  <h2>Crear un Nuevo Libro</h2>
+  <form action="{{ url_for('main.libros') }}" method="POST">
+    <div class="mb-3">
+      <label for="titulo" class="form-label">Título</label>
+      <input type="text" class="form-control" id="titulo" name="titulo" value="Cien años de soledad" required>
+    </div>
+    <div class="mb-3">
+      <label for="descripcion" class="form-label">Descripción</label>
+      <textarea class="form-control" id="descripcion" name="descripcion" required></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="autor" class="form-label">Autor</label>
+      <input type="text" class="form-control" id="autor" name="autor" value="Gabriel Garcia Marquez" required>
+    </div>
+    <div class="mb-3">
+      <label for="anio_publicacion" class="form-label">Año de Publicación</label>
+      <input type="number" class="form-control" id="anio_publicacion" name="anio_publicacion" value="1967" required>
+    </div>
+    <div class="mb-3">
+      <label for="bibliotecario_id" class="form-label">Bibliotecario</label>
+      <input type="number" class="form-control" id="bibliotecario_id" name="bibliotecario_id" value="-1" required>
+    </div>
+    <div class="form-check mb-3">
+      <input type="checkbox" class="form-check-input" id="disponible" name="disponible" checked>
+      <label class="form-check-label" for="disponible">Disponible</label>
+    </div>
+    <button type="submit" class="btn btn-primary">Crear Libro</button>
+  </form>
 {% endblock %}
