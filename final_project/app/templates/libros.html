@@ -24,17 +24,22 @@
           <td>{{ libro.titulo }}</td>
           <td>{{ libro.descripcion }}</td>
           <td>{{ libro.autor }}</td>
-          <td>{{ libro.disponible | yesno:"Disponible,No disponible" }}</td>
+          <td>{{ 'Disponible' if libro.disponible else 'No disponible' }}</td>
           <td>
+            <!-- Botón Editar -->
             <a href="{{ url_for('main.editar_libro', id=libro.id) }}" class="btn btn-warning">Editar</a>
+
+            <!-- Formulario para eliminar libro -->
             <form action="{{ url_for('main.eliminar_libro', id=libro.id) }}" method="POST" style="display:inline;">
-              <button type="submit" class="btn btn-danger">Eliminar</button>
+              {{ csrf_token() }}
+              <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este libro?')">Eliminar</button>
             </form>
           </td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
-  
+
+  <!-- Botón para crear nuevo libro -->
   <a href="{{ url_for('main.crear_libro') }}" class="btn btn-primary">Nuevo Libro</a>
 {% endblock %}

@@ -147,3 +147,16 @@ def listar_usuarios():
     usuarios = User.query.join(User.role).all()
 
     return render_template('usuarios.html', usuarios=usuarios)
+
+@main.route('/libros/listar')
+@login_required
+def listar_libros():
+    """
+    Permite listar los libros disponibles.
+    """
+    if current_user.role.name == 'Lector':
+        libros = Libro.query.filter_by(disponible=True).all()
+    else:
+        libros = Libro.query.all()  # Admin y bibliotecarios pueden ver todos los libros
+    
+    return render_template('listar_libros.html', libros=libros)

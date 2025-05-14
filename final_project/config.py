@@ -4,12 +4,11 @@ import os
 class Config:
     """
     Configuración general para la aplicación Gestor de Biblioteca.
-    Esta clase puede extenderse para diferentes entornos 
+    Esta clase puede extenderse para diferentes entornos
     como desarrollo, producción o pruebas.
     """
 
     # Clave secreta para sesiones y protección CSRF
-    # En producción, se recomienda definir esta variable en las variables de entorno
     SECRET_KEY = os.environ.get('SECRET_KEY', 'clave-secreta-flask')
 
     # URI de conexión a la base de datos
@@ -31,4 +30,9 @@ class Config:
         'admin': 'Admin'
     }
 
-    # Puedes añadir aquí otras configuraciones necesarias, como paginación, logs, etc.
+    # Configuraciones para Flask-Login
+    REMEMBER_COOKIE_DURATION = 3600 * 24 * 7  # Duración de la cookie "recordarme" (7 días)
+    SESSION_PERMANENT = False                # Las sesiones no son permanentes por defecto
+    SESSION_TYPE = "filesystem"              # Tipo de almacenamiento de sesiones (útil para Flask-Session)
+    LOGIN_VIEW = 'auth.login'                # Ruta del login (puedes cambiarla según tu blueprint)
+    LOGIN_MESSAGE = "Por favor, inicia sesión para acceder a esta página."

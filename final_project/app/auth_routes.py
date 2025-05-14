@@ -21,7 +21,7 @@ def login():
 
             # Redirige según el rol (opcional)
             if user.role.name == "Admin":
-                return redirect(url_for('main.admin_dashboard'))
+                return redirect(url_for('main.dashboard'))
             elif user.role.name == "Bibliotecario":
                 return redirect(url_for('main.librarian_dashboard'))
             else:

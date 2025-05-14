@@ -1,16 +1,18 @@
 {% extends "layout.html" %}
 
 {% block title %}
-  {{ editar and "Editar Libro" or "Nuevo Libro" }}
+  {{ 'Editar Libro' if editar else 'Nuevo Libro' }}
 {% endblock %}
 
 {% block content %}
-  <h2 class="mb-4">{{ editar and "Editar Libro" or "Nuevo Libro" }}</h2>
+  <h2 class="mb-4">
+    {{ 'Editar Libro' if editar else 'Nuevo Libro' }}
+  </h2>
 
   <form method="POST" novalidate>
     {{ form.hidden_tag() }}
 
-    <!-- Libro Titulo -->
+    <!-- Libro Título -->
     <div class="mb-3">
       {{ form.titulo.label(class="form-label") }}
       {{ form.titulo(class="form-control", placeholder="Ingrese el título del libro") }}
@@ -22,13 +24,19 @@
       {{ form.descripcion(class="form-control", placeholder="Ingrese la descripción del libro") }}
     </div>
 
-    <!-- Autor del Libro -->
+    <!-- Autor -->
     <div class="mb-3">
       {{ form.autor.label(class="form-label") }}
       {{ form.autor(class="form-control", placeholder="Ingrese el autor del libro") }}
     </div>
 
-    <!-- Submit Button -->
+    <!-- Disponible -->
+    <div class="mb-3 form-check">
+      {{ form.disponible(class="form-check-input") }}
+      {{ form.disponible.label(class="form-check-label") }}
+    </div>
+
+    <!-- Botón enviar -->
     <div class="mb-3">
       {{ form.submit(class="btn btn-primary") }}
     </div>
