@@ -4,42 +4,49 @@ from wtforms.validators import DataRequired, Email, EqualTo, Length
 
 # Formulario para login de usuario
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Login')
+    email = StringField('Correo electrónico', validators=[DataRequired(), Email()])
+    password = PasswordField('Contraseña', validators=[DataRequired()])
+    submit = SubmitField('Iniciar sesión')
 
 # Formulario para registrar un nuevo usuario
 class RegisterForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm password', validators=[DataRequired(), EqualTo('password')])
-   
+    username = StringField('Nombre de usuario', validators=[DataRequired()])
+    email = StringField('Correo electrónico', validators=[DataRequired(), Email()])
+    password = PasswordField('Contraseña', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirmar contraseña', validators=[DataRequired(), EqualTo('password')])
+    
     role = SelectField(
-        'Role',
+        'Rol',
         choices=[('Lector', 'Lector'), ('Bibliotecario', 'Bibliotecario'), ('Admin', 'Admin')],
         validators=[DataRequired()]
     )
 
-    submit = SubmitField('Register')
+    submit = SubmitField('Registrar')
 
 # Formulario para cambiar la contraseña del usuario
 class ChangePasswordForm(FlaskForm):
-    old_password = PasswordField('Current password', validators=[DataRequired()])
-    new_password = PasswordField('New password', validators=[DataRequired(), Length(min=6)])
-    confirm_password = PasswordField('Confirm new password', validators=[DataRequired(), EqualTo('new_password')])
-    submit = SubmitField('Update Password')
+    old_password = PasswordField('Contraseña actual', validators=[DataRequired()])
+    new_password = PasswordField('Nueva contraseña', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirmar nueva contraseña', validators=[DataRequired(), EqualTo('new_password')])
+    submit = SubmitField('Actualizar contraseña')
 
 # Formulario para crear o editar un libro
 class LibroForm(FlaskForm):
-    titulo = StringField('Book title', validators=[DataRequired()])
-    descripcion = TextAreaField('Description', validators=[DataRequired()])
-    autor = StringField('Author', validators=[DataRequired()])
-    submit = SubmitField('Save')
+    titulo = StringField('Título del libro', validators=[DataRequired()])
+    descripcion = TextAreaField('Descripción', validators=[DataRequired()])
+    autor = StringField('Autor', validators=[DataRequired()])
+    categoria_id = SelectField('Categoría', coerce=int, validators=[DataRequired()])
+    disponible = SelectField(
+        'Disponible',
+        choices=[(True, 'Sí'), (False, 'No')],
+        coerce=lambda x: x == 'True',
+        validators=[DataRequired()]
+    )
+    submit = SubmitField('Guardar')
 
 # Formulario para registrar un préstamo de libro
 class PrestamoForm(FlaskForm):
-    libro_id = SelectField('Book', coerce=int, validators=[DataRequired()])
-    fecha_prestamo = DateField('Loan Date', format='%Y-%m-%d', validators=[DataRequired()])
-    fecha_devolucion = DateField('Return Date', format='%Y-%m-%d')
-    submit = SubmitField('Register Loan')
+    libro_id = SelectField('Libro', coerce=int, validators=[DataRequired()])
+    fecha_prestamo = DateField('Fecha de préstamo', format='%Y-%m-%d', validators=[DataRequired()])
+    fecha_devolucion = DateField('Fecha de devolución', format='%Y-%m-%d')
+    submit = SubmitField('Registrar préstamo')

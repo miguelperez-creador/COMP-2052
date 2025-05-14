@@ -1,44 +1,20 @@
-{% extends "layout.html" %}
-
-{% block title %}
-  {{ 'Editar Libro' if editar else 'Nuevo Libro' }}
-{% endblock %}
-
-{% block content %}
-  <h2 class="mb-4">
-    {{ 'Editar Libro' if editar else 'Nuevo Libro' }}
-  </h2>
-
-  <form method="POST" novalidate>
-    {{ form.hidden_tag() }}
-
-    <!-- Libro Título -->
-    <div class="mb-3">
-      {{ form.titulo.label(class="form-label") }}
-      {{ form.titulo(class="form-control", placeholder="Ingrese el título del libro") }}
+<form method="POST">
+    {{ form.hidden_tag() }}  <!-- Esto agrega el CSRF token automáticamente -->
+    
+    <div class="form-group">
+        <label for="titulo">Título:</label>
+        {{ form.titulo(class="form-control") }}
     </div>
 
-    <!-- Libro Descripción -->
-    <div class="mb-3">
-      {{ form.descripcion.label(class="form-label") }}
-      {{ form.descripcion(class="form-control", placeholder="Ingrese la descripción del libro") }}
+    <div class="form-group">
+        <label for="descripcion">Descripción:</label>
+        {{ form.descripcion(class="form-control") }}
     </div>
 
-    <!-- Autor -->
-    <div class="mb-3">
-      {{ form.autor.label(class="form-label") }}
-      {{ form.autor(class="form-control", placeholder="Ingrese el autor del libro") }}
+    <div class="form-group">
+        <label for="autor">Autor:</label>
+        {{ form.autor(class="form-control") }}
     </div>
 
-    <!-- Disponible -->
-    <div class="mb-3 form-check">
-      {{ form.disponible(class="form-check-input") }}
-      {{ form.disponible.label(class="form-check-label") }}
-    </div>
-
-    <!-- Botón enviar -->
-    <div class="mb-3">
-      {{ form.submit(class="btn btn-primary") }}
-    </div>
-  </form>
-{% endblock %}
+    <button type="submit" class="btn btn-primary">Crear Libro</button>
+</form>

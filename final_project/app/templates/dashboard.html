@@ -8,7 +8,6 @@
     <h3>Library Management</h3>
   </div>
   <div class="col text-end">
-    <!-- Solo permitir agregar libros si no es un Lector -->
     {% if current_user.role.name != 'Lector' %}
     <a class="btn btn-primary mb-3 me-2" href="{{ url_for('main.libros') }}">
       <i class="bi bi-plus"></i> New Book
@@ -28,35 +27,45 @@
     </tr>
   </thead>
   <tbody>
-    {% for libro in libros %}
+    {% if libros|length == 0 %}
     <tr>
-      <td>{{ libro.titulo }}</td>
-      <td>{{ libro.autor }}</td>
-      <td>{{ libro.categoria }}</td>
-      <td>{{ libro.estado }}</td>
-      <td class="text-center ps-0 pe-0">
-        <!-- Solo permitir editar y eliminar si el usuario es Admin o si el libro fue creado por el bibliotecario -->
-        {% if current_user.role.name == 'Admin' or libro.bibliotecario_id == current_user.id %}
-        <a class="btn btn-sm btn-warning"
-           href="{{ url_for('main.editar_libro', id=libro.id) }}" title="Edit book">
-          <i class="bi bi-pencil"></i>
-        </a>
-        <form method="POST" action="{{ url_for('main.eliminar_libro', id=libro.id) }}" style="display: inline"
-              onsubmit="return confirm('Are you sure you want to delete this book?');">
-          <button type="submit" class="btn btn-sm btn-danger" title="Delete book">
-            <i class="bi bi-trash"></i>
-          </button>
-        </form>
-        {% else %}
-        <span class="text-muted"><i class="bi bi-lock"></i></span>
-        {% endif %}
-      </td>
+      <td colspan="5" class="text-center">No books available.</td>
     </tr>
-    {% endfor %}
+    {% else %}
+      {% for libro in libros %}
+      <tr>
+        <td>{{ libro.titulo }}</td>
+        <td>{{ libro.autor }}</td>
+        <td>{{ libro.categoria.nombre }}</td>
+        <td>
+          {% if libro.disponible %}
+            <span class="text-success">Available</span>
+          {% else %}
+            <span class="text-danger">Not Available</span>
+          {% endif %}
+        </td>
+        <td class="text-center ps-0 pe-0">
+          {% if current_user.role.name == 'Admin' or libro.bibliotecario_id == current_user.id %}
+          <a class="btn btn-sm btn-warning"
+             href="{{ url_for('main.editar_libro', id=libro.id) }}" title="Edit book">
+            <i class="bi bi-pencil"></i>
+          </a>
+          <form method="POST" action="{{ url_for('main.eliminar_libro', id=libro.id) }}" style="display: inline"
+                onsubmit="return confirm('Are you sure you want to delete this book?');">
+            <button type="submit" class="btn btn-sm btn-danger" title="Delete book">
+              <i class="bi bi-trash"></i>
+            </button>
+          </form>
+          {% else %}
+          <span class="text-muted"><i class="bi bi-lock"></i></span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    {% endif %}
   </tbody>
 </table>
 
-<!-- Mensaje para los Lectores -->
 {% if current_user.role.name == 'Lector' %}
 <p class="text-center pe-3 mt-0 text-body-tertiary fw-lighter fst-italic">
   You do not have permission to create, update or delete books.

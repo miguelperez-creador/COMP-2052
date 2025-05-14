@@ -71,7 +71,7 @@ def libros():
 
 @main.route('/libros/<int:id>/editar', methods=['GET', 'POST'])
 @login_required
-def editar_libro(id):
+def crear_libro(id):
     """
     Permite editar un libro existente. Solo si es admin o bibliotecario.
     """

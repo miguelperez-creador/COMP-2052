@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block title %}Libros{% endblock %}
+
+{% block content %}
+  <h2 class="mb-4">Lista de Libros</h2>
+
+  <!-- Tabla de Libros -->
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Título</th>
+        <th scope="col">Descripción</th>
+        <th scope="col">Autor</th>
+        <th scope="col">Disponibilidad</th>
+        <th scope="col">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if libros|length == 0 %}
+        <tr>
+          <td colspan="6" class="text-center">No hay libros disponibles.</td>
+        </tr>
+      {% else %}
+        {% for libro in libros %}
+          <tr>
+            <td>{{ libro.id }}</td>
+            <td>{{ libro.titulo }}</td>
+            <td>{{ libro.descripcion }}</td>
+            <td>{{ libro.autor }}</td>
+            <td>{{ 'Disponible' if libro.disponible else 'No disponible' }}</td>
+            <td>
+              <!-- Botón Editar -->
+              <a href="{{ url_for('main.editar_libro', id=libro.id) }}" class="btn btn-warning">Editar</a>
+
+              <!-- Formulario para eliminar libro -->
+              <form action="{{ url_for('main.eliminar_libro', id=libro.id) }}" method="POST" style="display:inline;">
+                {{ csrf_token() }}
+                <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este libro?')">Eliminar</button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      {% endif %}
+    </tbody>
+  </table>
+
+  <!-- Botón para crear nuevo libro -->
+  <a href="{{ url_for('main.crear_libro') }}" class="btn btn-primary">Nuevo Libro</a>
+{% endblock %}
