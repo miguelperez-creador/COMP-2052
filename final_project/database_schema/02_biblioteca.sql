@@ -1,7 +1,3 @@
--- Eliminar la base de datos si existe
-DROP DATABASE IF EXISTS gestor_biblioteca;
-
--- Usar la base de datos recién creada
 DROP DATABASE IF EXISTS gestor_biblioteca;
 CREATE DATABASE gestor_biblioteca
     CHARACTER SET utf8mb4
@@ -9,13 +5,13 @@ CREATE DATABASE gestor_biblioteca
 
 USE gestor_biblioteca;
 
--- Crear la tabla de roles
+-- Tabla de roles
 CREATE TABLE role (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(64) UNIQUE NOT NULL
 );
 
--- Crear la tabla de usuarios
+-- Tabla de usuarios
 CREATE TABLE user (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(64) UNIQUE NOT NULL,
@@ -25,18 +21,25 @@ CREATE TABLE user (
     FOREIGN KEY (role_id) REFERENCES role(id)
 );
 
--- Crear la tabla de libros
+-- Tabla de autores
+CREATE TABLE autor (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL
+);
+
+-- Tabla de libros con relación a autor
 CREATE TABLE libro (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(150) NOT NULL,
-    autor VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    autor_id INT,
     isbn VARCHAR(20) UNIQUE NOT NULL,
     categoria VARCHAR(50),
-    estado ENUM('Disponible', 'Prestado') DEFAULT 'Disponible',
+    disponible BOOLEAN DEFAULT TRUE,
     anio_publicacion INT,
-    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ALTER TABLE libro ADD COLUMN descripcion TEXT;
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (autor_id) REFERENCES autor(id)
 );
 
--- Insertar los roles iniciales
+-- Insertar roles
 INSERT INTO role (name) VALUES ('Admin'), ('Bibliotecario'), ('Lector');

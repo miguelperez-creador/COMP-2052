@@ -7,5 +7,4 @@ Content-Type: application/json
   "autor": "Gabriel García Márquez",
   "anio_publicacion": 1967,
   "bibliotecario_id": 1
-  "inicio": ""
 }

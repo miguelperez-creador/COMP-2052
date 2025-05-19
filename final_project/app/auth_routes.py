@@ -6,6 +6,7 @@ from flask_login import login_user, logout_user
 # Blueprint de autenticación: gestiona login, registro y logout
 auth = Blueprint('auth', __name__)
 
+
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     """
@@ -23,7 +24,7 @@ def login():
             if user.role.name == "Admin":
                 return redirect(url_for('main.dashboard'))
             elif user.role.name == "Bibliotecario":
-                return redirect(url_for('main.librarian_dashboard'))
+                return redirect(url_for('main.dashboard'))
             else:
                 return redirect(url_for('main.dashboard'))
 
@@ -31,17 +32,17 @@ def login():
 
     return render_template('login.html', form=form)
 
+
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     """
     Registra un nuevo usuario y lo asocia por defecto al rol seleccionado.
-    """    
+    """
     form = RegisterForm()
-    
+
     if form.validate_on_submit():
         role = Role.query.filter_by(name=form.role.data).first()
 
-        
         if not role:
             role = Role(name=form.role.data)
             db.session.add(role)
@@ -61,6 +62,7 @@ def register():
         return redirect(url_for('auth.login'))
 
     return render_template('register.html', form=form)
+
 
 @auth.route('/logout')
 def logout():
