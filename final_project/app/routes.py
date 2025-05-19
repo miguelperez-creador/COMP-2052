@@ -1,10 +1,12 @@
+from app.models import Autor  # asegúrate de importarlo arriba
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_required, current_user
 from app.forms import LibroForm, ChangePasswordForm, PrestamoForm
 from app.models import db, Libro, User, Prestamo
-
+from app.models import Autor
 # Blueprint principal que maneja el dashboard, gestión de libros y cambio de contraseña
 main = Blueprint('main', __name__)
+
 
 @main.route('/')
 def index():
@@ -12,6 +14,7 @@ def index():
     Página de inicio pública (home).
     """
     return render_template('index.html')
+
 
 @main.route('/cambiar-password', methods=['GET', 'POST'])
 @login_required
@@ -35,6 +38,7 @@ def cambiar_password():
 
     return render_template('cambiar_password.html', form=form)
 
+
 @main.route('/dashboard')
 @login_required
 def dashboard():
@@ -48,20 +52,27 @@ def dashboard():
 
     return render_template('dashboard.html', libros=libros)
 
+
 @main.route('/libros', methods=['GET', 'POST'])
 @login_required
-def libros():
-    """
-    Permite crear un nuevo libro. Solo disponible para bibliotecarios o admins.
-    """
+def crear_libro():
     form = LibroForm()
     if form.validate_on_submit():
+        # Buscar o crear autor
+        nombre_autor = form.autor.data.strip()
+        autor_obj = Autor.query.filter_by(nombre=nombre_autor).first()
+        if not autor_obj:
+            autor_obj = Autor(nombre=nombre_autor)
+            db.session.add(autor_obj)
+            db.session.commit()  # necesario para obtener id
+
         libro = Libro(
             titulo=form.titulo.data,
             descripcion=form.descripcion.data,
-            autor=form.autor.data,
-            disponible=True  # Por defecto, los libros recién creados están disponibles
+            autor_id=autor_obj.id,
+            disponible=form.disponible.data,
         )
+
         db.session.add(libro)
         db.session.commit()
         flash("Libro creado exitosamente.")
@@ -69,9 +80,10 @@ def libros():
 
     return render_template('libro_form.html', form=form)
 
+
 @main.route('/libros/<int:id>/editar', methods=['GET', 'POST'])
 @login_required
-def crear_libro(id):
+def editar_libro(id):
     """
     Permite editar un libro existente. Solo si es admin o bibliotecario.
     """
@@ -87,12 +99,14 @@ def crear_libro(id):
     if form.validate_on_submit():
         libro.titulo = form.titulo.data
         libro.descripcion = form.descripcion.data
-        libro.autor = form.autor.data
+        libro.autor = Autor.query.get(
+            form.autor.data)  # ← Esto es una instancia
         db.session.commit()
         flash("Libro actualizado exitosamente.")
         return redirect(url_for('main.dashboard'))
 
     return render_template('libro_form.html', form=form, editar=True)
+
 
 @main.route('/libros/<int:id>/eliminar', methods=['POST'])
 @login_required
@@ -111,6 +125,7 @@ def eliminar_libro(id):
     flash("Libro eliminado exitosamente.")
     return redirect(url_for('main.dashboard'))
 
+
 @main.route('/prestamos', methods=['GET', 'POST'])
 @login_required
 def prestamos():
@@ -118,7 +133,8 @@ def prestamos():
     Permite registrar un préstamo de libro. Solo disponible para lectores.
     """
     form = PrestamoForm()
-    form.libro_id.choices = [(libro.id, libro.titulo) for libro in Libro.query.filter_by(disponible=True).all()]
+    form.libro_id.choices = [(libro.id, libro.titulo)
+                             for libro in Libro.query.filter_by(disponible=True).all()]
 
     if form.validate_on_submit():
         prestamo = Prestamo(
@@ -136,6 +152,7 @@ def prestamos():
 
     return render_template('prestamo_form.html', form=form)
 
+
 @main.route('/usuarios')
 @login_required
 def listar_usuarios():
@@ -148,6 +165,7 @@ def listar_usuarios():
 
     return render_template('usuarios.html', usuarios=usuarios)
 
+
 @main.route('/libros/listar')
 @login_required
 def listar_libros():
@@ -158,5 +176,5 @@ def listar_libros():
         libros = Libro.query.filter_by(disponible=True).all()
     else:
         libros = Libro.query.all()  # Admin y bibliotecarios pueden ver todos los libros
-    
-    return render_template('listar_libros.html', libros=libros)
+
+    return render_template('libros.html', libros=libros)
