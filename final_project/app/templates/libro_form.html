@@ -1,3 +1,4 @@
+<!--Proyecto de Back-End#-->
 {% extends "layout.html" %}
 
 {% block title %}
@@ -22,18 +23,16 @@
         {{ form.descripcion(rows=6, cols=60) }}
     </p>
 
-    <p class="autor-field">
+    <p>
         {{ form.autor.label }}<br>
-        {{ form.autor(size=10) }}
+        {{ form.autor(class="form-select", style="width: 300px;") }}
+
+
     </p>
 
     <p>
-        {{ form.isbn.label }}<br>
-        {{ form.isbn(size=20) }}
-    </p>
-
-    <p>
-        {{ form.disponible() }} {{ form.disponible.label }}
+        {{ form.disponible.label }}<br>
+        {{ form.disponible(class="form-select", style="width: 150px;") }}
     </p>
 
     <p><input type="submit" value="Guardar libro"></p>

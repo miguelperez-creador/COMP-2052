@@ -49,7 +49,7 @@ class Autor(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
 
-    libros = db.relationship('Libro', backref='autor', lazy=True)
+    libros = db.relationship('Libro', back_populates='autor')
 
 # Modelo de libro
 
@@ -62,7 +62,7 @@ class Libro(db.Model):
     descripcion = db.Column(db.Text, nullable=True)
     autor_id = db.Column(db.Integer, db.ForeignKey('autor.id'), nullable=False)
     disponible = db.Column(db.Boolean, default=True)
-    isbn = db.Column(db.String(13))
+    autor = db.relationship('Autor', back_populates='libros')
     prestamos = db.relationship('Prestamo', backref='libro', lazy=True)
 
 # Modelo de préstamo de libros

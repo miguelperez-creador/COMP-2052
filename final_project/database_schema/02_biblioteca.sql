@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+-- Active: 1747575679602@@127.0.0.1@3306@gestor_biblioteca
+>>>>>>> 486c39d8256263668fb62fccea47db337a8c5966
 DROP DATABASE IF EXISTS gestor_biblioteca;
 CREATE DATABASE gestor_biblioteca
     CHARACTER SET utf8mb4

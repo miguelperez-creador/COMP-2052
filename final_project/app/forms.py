@@ -48,11 +48,13 @@ class ChangePasswordForm(FlaskForm):
 class LibroForm(FlaskForm):
     titulo = StringField('Título', validators=[DataRequired()])
     descripcion = TextAreaField('Descripción', validators=[DataRequired()])
-    autor = SelectField('Autor', coerce=int, validators=[
-                        DataRequired()])  # ← SelectField
-    isbn = StringField('ISBN')
-    disponible = SelectField('¿Disponible?', choices=[
-                             ('si', 'Sí'), ('no', 'No')])
+    autor = StringField('Autor', validators=[DataRequired()])  # ← SelectField
+    disponible = SelectField(
+        '¿Disponible?',
+        choices=[('True', 'Sí'), ('False', 'No')],
+        coerce=lambda x: x == 'True'
+    )
+
     submit = SubmitField('Guardar')
 # Formulario para registrar un préstamo de libro
 

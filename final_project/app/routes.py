@@ -71,7 +71,6 @@ def crear_libro():
             descripcion=form.descripcion.data,
             autor_id=autor_obj.id,
             disponible=form.disponible.data,
-            isbn=form.isbn.data
         )
 
         db.session.add(libro)
