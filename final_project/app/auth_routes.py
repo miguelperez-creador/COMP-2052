@@ -1,4 +1,3 @@
-<!--Proyecto de Back-End#-->
 from flask import Blueprint, render_template, redirect, url_for, flash
 from app.forms import LoginForm, RegisterForm
 from app.models import db, User, Role
